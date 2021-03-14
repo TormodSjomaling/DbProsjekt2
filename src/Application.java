@@ -11,6 +11,7 @@ import java.util.Scanner;
  * and receiving input from the user.
  */
 public class Application {
+    Engine engine = new Engine();
 
     /**
      * Constructor for objects of class ApplicationUI
@@ -119,7 +120,6 @@ public class Application {
         String passwordInput = reader.nextLine();
 
         User user = new User(emailInput, "placeholder", passwordInput, 0);
-        Engine engine = new Engine();
 
         if(!engine.tryLogin(user)){
             System.out.println("Ikke riktig email eller passord. Prøv igjen.");
@@ -147,7 +147,6 @@ public class Application {
 
         LocalDate localdate = LocalDate.now();
         Post post = new Post(localdate, contentInput, threadTitleInput, null);
-        Engine engine = new Engine();
 
         engine.registerPost(post, folderInput, tagInput);
     }

@@ -7,7 +7,7 @@ public class Post {
     private LocalDate date;
     private String content;
     private String threadTitle;
-    private int isCommentOnPostID;
+    private Integer isCommentOnPostID;
 
     public Post(LocalDate date, String content, String threadTitle, Integer isCommentOnPostID) {
         this.date = date;

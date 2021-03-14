@@ -5,11 +5,12 @@ import com.mysql.cj.protocol.Resultset;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 public class Engine extends DbConn{
 
-    Integer userCurrentlyLoggedIn;
+    int userCurrentlyLoggedIn;
 
     /**
      * Constructor of object Engine
@@ -63,23 +64,22 @@ public class Engine extends DbConn{
      * Responsible for checking if the post created by the user is a Thread or a Replay/Comment
      * @param post Values of user input put into a Post object
      */
-    public boolean registerPost(Post post, String folder, String tag){
+    public void registerPost(Post post, String folder, String tag){
         if(post.getIsCommentOnPostID() == null){
             registerThread(post, folder, tag);
         }
         else {
             registerComment(post);
         }
-        return false;
     }
 
     /**
      * Responsible for handling the backend part of inserting the post into the database.
      * @param post Values of user input put into a Post object
      */
-    private boolean registerThread(Post post, String folder, String tag){
+    private void registerThread(Post post, String folder, String tag){
         try {
-            String query = "SELECT courseID FROM usertocourse WHERE userID = ?";
+            String query = "SELECT courseID FROM piazza4db.usertocourse WHERE userID = ?";
             PreparedStatement pst = conn.prepareStatement(query);
 
             pst.setInt(1, userCurrentlyLoggedIn);
@@ -88,17 +88,17 @@ public class Engine extends DbConn{
             if(rs.next()) {
                 Integer courseID = rs.getInt("courseID");
 
-                String query2 = "SELECT folderID FROM folder WHERE name = ?";
+                String query2 = "SELECT folderID FROM piazza4db.folder WHERE name = ?";
                 PreparedStatement pst2 = conn.prepareStatement(query2);
 
                 pst2.setString(1, folder);
                 ResultSet rs2 = pst2.executeQuery();
 
                 if(rs2.next()){
-                    Integer folderID = rs.getInt("folderID");
+                    Integer folderID = rs2.getInt("folderID");
 
                     String query3 = "INSERT INTO piazza4db.post (createdAt, content, threadTitle, folderID, courseID, userID) VALUES (?, ?, ?, ?, ?, ?)";
-                    PreparedStatement pst3 = conn.prepareStatement(query3);
+                    PreparedStatement pst3 = conn.prepareStatement(query3, Statement.RETURN_GENERATED_KEYS);
 
                     pst3.setObject(1, post.getDate());
                     pst3.setString(2, post.getContent());
@@ -111,13 +111,9 @@ public class Engine extends DbConn{
                         conn.commit();
                         System.out.println("\n Post ble laget.");
 
-                        String query4 = "SELECT SCOPE_IDENTITY()";
-                        PreparedStatement pst4 = conn.prepareStatement(query4);
-
-                        ResultSet rs3 = pst4.executeQuery();
-
+                        ResultSet rs3 = pst3.getGeneratedKeys();
                         if(rs3.next()){
-                            Integer postID = rs3.getInt("postID");
+                            int postID = rs3.getInt(1);
                             registerTagOnPost(tag, postID);
                         }
                     }
@@ -125,9 +121,8 @@ public class Engine extends DbConn{
             }
 
         } catch (Exception e){
-
+            System.out.println("Noe gikk galt!");
         }
-        return false;
     }
 
     /**
@@ -143,16 +138,16 @@ public class Engine extends DbConn{
      */
     private void registerTagOnPost(String tag, int postID) {
         try{
-            String query = "SELECT tagID FROM tag WHERE tagID = ?";
+            String query = "SELECT tagID FROM piazza4db.tag WHERE name = ?";
             PreparedStatement pst = conn.prepareStatement(query);
 
             pst.setString(1, tag);
             ResultSet rs = pst.executeQuery();
 
             if(rs.next()){
-                Integer tagID = rs.getInt("tagID");
+                int tagID = rs.getInt("tagID");
 
-                String query2 = "INSERT INTO tagsonthread (tagID, postID) VALUES (?, ?)";
+                String query2 = "INSERT INTO piazza4db.tagsonthread (tagID, postID) VALUES (?, ?)";
                 PreparedStatement pst2 = conn.prepareStatement(query2);
 
                 pst2.setInt(1, tagID);
