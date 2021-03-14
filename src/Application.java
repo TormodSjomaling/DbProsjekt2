@@ -1,5 +1,7 @@
+import Entities.Post;
 import Entities.User;
 
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -9,6 +11,7 @@ import java.util.Scanner;
  * and receiving input from the user.
  */
 public class Application {
+    Engine engine = new Engine();
 
     /**
      * Constructor for objects of class ApplicationUI
@@ -17,11 +20,10 @@ public class Application {
     }
 
     private String[] menuItems = { // Edit later
-            "1. Valg 1.",
-            "2. Valg 2.",
-            "3. Valg 3.",
-            "4. Valg 4.",
-            "5. Valg 5.",
+            "1. Ny Post.",
+            "2. Svar på en post.",
+            "3. Søk.",
+            "4. Se statistikk.",
     };
 
     /**
@@ -43,21 +45,22 @@ public class Application {
                     int menuSelection = this.showMenu();
                     switch (menuSelection) {
                         case 1:
+                            addNewPost();
                             break;
 
                         case 2:
+                            replayToPost();
                             break;
 
                         case 3:
+                            getAllPostsMatchingKeyword();
                             break;
 
                         case 4:
+                            getStatisticsAboutUsers();
                             break;
 
                         case 5:
-                            break;
-
-                        case 6:
                             System.out.println("\nTakk for at du brukte vår applikasjon.\n");
                             quit = true;
                             break;
@@ -117,7 +120,6 @@ public class Application {
         String passwordInput = reader.nextLine();
 
         User user = new User(emailInput, "placeholder", passwordInput, 0);
-        Engine engine = new Engine();
 
         if(!engine.tryLogin(user)){
             System.out.println("Ikke riktig email eller passord. Prøv igjen.");
@@ -125,5 +127,45 @@ public class Application {
         }
 
         return engine.tryLogin(user);
+    }
+
+    /**
+     * Handles interaction with the user to create a new post.
+     */
+    public void addNewPost(){
+        Scanner reader = new Scanner(System.in);
+
+        System.out.println("\nOpprettelse av en ny post: ");
+        System.out.println("Tittel: ");
+        String threadTitleInput = reader.nextLine();
+        System.out.println("Innhold: ");
+        String contentInput = reader.nextLine();
+        System.out.println("Mappe: ");
+        String folderInput = reader.nextLine();
+        System.out.println("Tag: ");
+        String tagInput = reader.nextLine();
+
+        LocalDate localdate = LocalDate.now();
+        Post post = new Post(localdate, contentInput, threadTitleInput, null);
+
+        engine.registerPost(post, folderInput, tagInput);
+    }
+
+    /**
+     * Handles interaction with the user to replay to a specific post.
+     */
+    public void replayToPost(){
+    }
+
+    /**
+     * Handles interaction with the user to search for posts matching keyword.
+     */
+    public void getAllPostsMatchingKeyword(){
+    }
+
+    /**
+     * Handles interaction with the user to search for posts matching keyword.
+     */
+    public void getStatisticsAboutUsers(){
     }
 }
