@@ -1,3 +1,5 @@
+import Entities.User;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -20,15 +22,7 @@ public class Application {
             "3. Valg 3.",
             "4. Valg 4.",
             "5. Valg 5.",
-            "6. Valg 6.",
     };
-
-    /**
-     * Initializes the application.
-     */
-    private void init() {
-        System.out.println("init() was called");
-    }
 
     /**
      * Starts the application by showing the menu and retrieving input from the
@@ -36,50 +30,45 @@ public class Application {
      */
     public void start()
     {
-        this.init();
+        System.out.println("\n**** Piazza Ripoff ****");
+        boolean loginSuccessful = false;
 
         boolean quit = false;
-
         while (!quit)
-        {
-            try
-            {
-                int menuSelection = this.showMenu();
-                switch (menuSelection)
-                {
-                    case 1:
-                        break;
+            if(!loginSuccessful) {
+                loginSuccessful = loginHandler();
+            }
+            else {
+                try {
+                    int menuSelection = this.showMenu();
+                    switch (menuSelection) {
+                        case 1:
+                            break;
 
-                    case 2:
-                        break;
+                        case 2:
+                            break;
 
-                    case 3:
-                        break;
+                        case 3:
+                            break;
 
-                    case 4:
-                        break;
+                        case 4:
+                            break;
 
-                    case 5:
-                        break;
+                        case 5:
+                            break;
 
-                    case 6:
-                        break;
+                        case 6:
+                            System.out.println("\nTakk for at du brukte vår applikasjon.\n");
+                            quit = true;
+                            break;
 
-                    case 7:
-                        System.out.println("\nTakk for at du brukte vår applikasjon. Ses!\n");
-                        quit = true;
-                        break;
-
-                    default:
-                        System.out.println("Noe gikk galt, prøv igjen!");
+                        default:
+                            System.out.println("Noe gikk galt, prøv igjen!");
+                    }
+                } catch (InputMismatchException ime) {
+                    System.out.println("\nERROR: Vennligst skriv inn et nummer mellom 1 og " + this.menuItems.length + "..\n");
                 }
             }
-            catch (InputMismatchException ime)
-            {
-                System.out.println("\nERROR: Vennligst skriv inn et nummer mellom 1 og " + this.menuItems.length + "..\n");
-            }
-
-        }
     }
 
     /**
@@ -92,7 +81,8 @@ public class Application {
      * @throws InputMismatchException if user enters an invalid number/menu choice
      */
     private int showMenu() throws InputMismatchException {
-        System.out.println("\n**** Applikasjon ****\n");
+        System.out.println("\n**** Applikasjonsvalg  ****\n");
+
         // Display the menu
         for ( String menuItem : menuItems )
         {
@@ -111,5 +101,29 @@ public class Application {
         }
 
         return menuSelection;
+    }
+
+    /**
+     * Handles the login interaction with the user.
+     * @return true or false, true if email and password matches row in db, false otherwise
+     */
+    public boolean loginHandler(){
+        Scanner reader = new Scanner(System.in);
+
+        System.out.println("\nLogg inn for å fortsette:");
+        System.out.println("Email: ");
+        String emailInput = reader.nextLine();
+        System.out.println("Passord: ");
+        String passwordInput = reader.nextLine();
+
+        User user = new User(emailInput, "placeholder", passwordInput, 0);
+        Engine engine = new Engine();
+
+        if(!engine.tryLogin(user)){
+            System.out.println("Ikke riktig email eller passord. Prøv igjen.");
+            return false;
+        }
+
+        return engine.tryLogin(user);
     }
 }
