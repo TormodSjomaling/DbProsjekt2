@@ -140,12 +140,16 @@ public class Application {
         String threadTitleInput = reader.nextLine();
         System.out.println("Innhold: ");
         String contentInput = reader.nextLine();
+        System.out.println("Mappe: ");
+        String folderInput = reader.nextLine();
+        System.out.println("Tag: ");
+        String tagInput = reader.nextLine();
 
         LocalDate localdate = LocalDate.now();
         Post post = new Post(localdate, contentInput, threadTitleInput, null);
         Engine engine = new Engine();
 
-        engine.registerPost(post);
+        engine.registerPost(post, folderInput, tagInput);
     }
 
     /**
