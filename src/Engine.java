@@ -35,9 +35,11 @@ public class Engine extends DbConn{
     public boolean tryLogin(User user){
         Boolean successfulLogin = false;
         try{
-            String query = "SELECT userID, email, password FROM piazza4db.user WHERE email = ?";
+            String query = "SELECT userID, email, password FROM piazza4db.user WHERE email = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, user.getEmail());
+            pst.setString(1, user.getPassword());
+
             ResultSet rs = pst.executeQuery();
 
             if(rs.next()){
