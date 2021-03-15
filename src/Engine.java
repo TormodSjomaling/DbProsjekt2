@@ -38,7 +38,7 @@ public class Engine extends DbConn{
             String query = "SELECT userID, email, password FROM piazza4db.user WHERE email = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, user.getEmail());
-            pst.setString(1, user.getPassword());
+            pst.setString(2, user.getPassword());
 
             ResultSet rs = pst.executeQuery();
 
@@ -189,8 +189,24 @@ public class Engine extends DbConn{
      * @param userInput String, keyword that user searched for.
      * @return List of postIDs matching the user input
      */
-    public List<Integer> getPostsMatching(int userInput){
-        return null;
+    public List<Integer> getPostsMatching(String userInput){
+        List<Integer> matchingPosts = new ArrayList<>();
+        try{
+            String query = "SELECT postID FROM piazza4db.post WHERE threadTitle LIKE ? OR content LIKE ?";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, '%' + userInput + '%');
+            pst.setString(2, '%' + userInput + '%');
+
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()) {
+                matchingPosts.add(rs.getInt("postID"));
+            }
+
+            return matchingPosts;
+        } catch (Exception e) {
+            System.out.println("Noe gikk galt ved søket. " + e);
+        }
+        return matchingPosts;
     }
 
     public boolean getStatisticsOfUsers(){
