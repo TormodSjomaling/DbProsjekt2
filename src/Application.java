@@ -177,6 +177,22 @@ public class Application {
      * Handles interaction with the user to search for posts matching keyword.
      */
     public void getAllPostsMatchingKeyword(){
+        Scanner reader = new Scanner(System.in);
+
+        System.out.println("Søk: ");
+        String searchInput = reader.nextLine();
+
+        List<Integer> matchingPosts = engine.getPostsMatching(searchInput);
+
+        if(matchingPosts.size() == 0){
+            System.out.println("\nFant ingen posts som matchet ditt søk.");
+        }
+        else {
+            System.out.println("\nHer er posts vi fant som matchet ditt søk:");
+            for (Integer postID : matchingPosts) {
+                System.out.println("postID: " + postID);
+            }
+        }
     }
 
     /**
