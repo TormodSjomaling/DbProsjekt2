@@ -1,8 +1,9 @@
 import Entities.Post;
 import Entities.User;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -49,7 +50,7 @@ public class Application {
                             break;
 
                         case 2:
-                            replayToPost();
+                            replyToPost();
                             break;
 
                         case 3:
@@ -145,16 +146,31 @@ public class Application {
         System.out.println("Tag: ");
         String tagInput = reader.nextLine();
 
-        LocalDate localdate = LocalDate.now();
-        Post post = new Post(localdate, contentInput, threadTitleInput, null);
+        Date date = new Date();
+        Post post = new Post(date, contentInput, threadTitleInput, null);
 
-        engine.registerPost(post, folderInput, tagInput);
+        engine.registerThread(post, folderInput, tagInput);
     }
 
     /**
      * Handles interaction with the user to replay to a specific post.
      */
-    public void replayToPost(){
+    public void replyToPost(){
+        List<Post> posts = engine.getPosts();
+        Scanner stringReader = new Scanner(System.in);
+        Scanner intReader = new Scanner(System.in);
+
+        System.out.println("\nHvilken thread vil du lage en kommentar til?");
+        for (Post post : posts){
+            System.out.println("Folder: " + post.getFolderName() + " postID: " + post.getPostID() + " Tittel: " + post.getThreadTitle());
+        }
+
+        System.out.println("\nPostID: ");
+        int postToReply = intReader.nextInt();
+        System.out.println("Kommentar: ");
+        String commentInput = stringReader.nextLine();
+        engine.registerComment(postToReply, commentInput);
+
     }
 
     /**

@@ -1,26 +1,51 @@
 package Entities;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 public class Post {
-    private LocalDate date;
+    private int postID;
+    private Date date;
     private String content;
     private String threadTitle;
     private Integer isCommentOnPostID;
+    private String folderName;
 
-    public Post(LocalDate date, String content, String threadTitle, Integer isCommentOnPostID) {
+    public Post(Date date, String content, String threadTitle, Integer isCommentOnPostID) {
         this.date = date;
         this.content = content;
         this.threadTitle = threadTitle;
         this.isCommentOnPostID = isCommentOnPostID;
     }
 
-    public LocalDate getDate() {
+    public Post(int postID, Date date, String content, String threadTitle, Integer isCommentOnPostID, String folderName) {
+        this.postID = postID;
+        this.content = content;
+        this.threadTitle = threadTitle;
+        this.isCommentOnPostID = isCommentOnPostID;
+        this.folderName = folderName;
+    }
+
+    public String getFolderName() {
+        return folderName;
+    }
+
+    public void setFolderName(String folderName) {
+        this.folderName = folderName;
+    }
+
+    public int getPostID() {
+        return postID;
+    }
+
+    public void setPostID(int postID) {
+        this.postID = postID;
+    }
+
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
