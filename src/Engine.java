@@ -1,11 +1,12 @@
 import Entities.Post;
 import Entities.User;
-import com.mysql.cj.protocol.Resultset;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Engine extends DbConn{
@@ -55,27 +56,12 @@ public class Engine extends DbConn{
     }
 
     /**
-     * Responsible for checking if the post created by the user is a Thread or a Replay/Comment
-     * @param post Values of user input put into a Post object
-     * @param folderInput String, name of folder given by the user
-     * @param tagInput String, name of user tag given by the user
-     */
-    public void registerPost(Post post, String folderInput, String tagInput){
-        if(post.getIsCommentOnPostID() == null){
-            registerThread(post, folderInput, tagInput);
-        }
-        else {
-            registerComment(post);
-        }
-    }
-
-    /**
      * Responsible for handling the backend part of inserting the post into the database.
      * @param post Values of user input put into a Post object
      * @param folderInput String, name of folder given by the user
      * @param tagInput String, name of user tag given by the user
      */
-    private void registerThread(Post post, String folderInput, String tagInput){
+    public void registerThread(Post post, String folderInput, String tagInput){
         try {
             String query = "SELECT courseID FROM piazza4db.usertocourse WHERE userID = ?";
             PreparedStatement pst = conn.prepareStatement(query);
@@ -122,10 +108,26 @@ public class Engine extends DbConn{
 
     /**
      * Responsible for handling the backend part of inserting the post into the database.
-     * @param post Values of user input put into a Post object
+     * @param postID int, postID to make a reply to
      */
-    private boolean registerComment(Post post){
-        return false;
+    public void registerComment(int postID, String commentInput){
+        try {
+            Date date = new Date(1);
+
+            String query = "INSERT INTO piazza4db.post (createdAt, content, isCommentOnPostID, userID) VALUES (?, ?, ?, ?)";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setDate(1, date);
+            pst.setString(2, commentInput);
+            pst.setInt(3, postID);
+            pst.setInt(4, userCurrentlyLoggedIn);
+
+            if (pst.executeUpdate() == 1) {
+                conn.commit();
+                System.out.println("Post ble laget.\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Noe gikk galt ved lagring av kommentar. " + e);
+        }
     }
 
     /**
@@ -158,12 +160,34 @@ public class Engine extends DbConn{
     }
 
     /**
+     * Responsible for fetching all posts in the database
+     * @return List<Post> List of posts sent back to the application layer.
+     */
+    public List<Post> getPosts(){
+        List<Post> posts = new ArrayList<Post>();
+        try {
+            String query = "SELECT postID, createdAt, content, threadTitle, piazza4db.folder.name FROM piazza4db.post INNER JOIN piazza4db.folder ON (post.folderID = folder.folderID)";
+            PreparedStatement pst = conn.prepareStatement(query);
+            ResultSet rs = pst.executeQuery();
+
+            //semi scuffed å lagre folderName is post her
+            while (rs.next()){
+                Post post = new Post(rs.getInt("postID"), rs.getDate("createdAt"), rs.getString("content"), rs.getString("threadTitle"), null, rs.getString("name"));
+                posts.add(post);
+            }
+        } catch (Exception e) {
+            System.out.println("Noe gikk galt ved henting a posts." + e);
+        }
+        return posts;
+    }
+
+    /**
      * Responsible for handling the backend part of fetching all posts matching user input and returning
      * all matching posts
      * @param userInput String, keyword that user searched for.
      * @return List of postIDs matching the user input
      */
-    public List<Integer> getPostsMatching(String userInput){
+    public List<Integer> getPostsMatching(int userInput){
         return null;
     }
 
