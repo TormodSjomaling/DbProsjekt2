@@ -12,7 +12,8 @@ import java.util.List;
 
 public class Engine extends DbConn{
 
-    int userCurrentlyLoggedIn;
+    private int userCurrentlyLoggedIn;
+    private int rolePermissions;
 
     /**
      * Constructor of object Engine
@@ -36,7 +37,7 @@ public class Engine extends DbConn{
     public boolean tryLogin(User user){
         Boolean successfulLogin = false;
         try{
-            String query = "SELECT userID, email, password FROM piazza4db.user WHERE email = ? AND password = ?";
+            String query = "SELECT userID, email, password, role FROM piazza4db.user WHERE email = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, user.getEmail());
             pst.setString(2, user.getPassword());
@@ -45,7 +46,9 @@ public class Engine extends DbConn{
 
             if(rs.next()){
                 int userID = rs.getInt("userID");
+                int role = rs.getInt("role");
 
+                rolePermissions = role;
                 userCurrentlyLoggedIn = userID;
                 successfulLogin = true;
             }
@@ -211,15 +214,17 @@ public class Engine extends DbConn{
     }
 
     public ResultSet getStatisticsOfUsers(){
-        try {
-            String query = "SELECT name, (SELECT COUNT(*) FROM piazza4db.userpostview WHERE userID=user.userID) AS numberOfPostsRead, (SELECT COUNT(*) FROM piazza4db.post WHERE userID=user.userID) AS numberOfPostCreated\n" +
-                    "FROM piazza4db.user";
-            PreparedStatement pst = conn.prepareStatement(query);
-            ResultSet rs = pst.executeQuery();
+        if (rolePermissions == 1) {
+            try {
+                String query = "SELECT name, (SELECT COUNT(*) FROM piazza4db.userpostview WHERE userID=user.userID) AS numberOfPostsRead, (SELECT COUNT(*) FROM piazza4db.post WHERE userID=user.userID) AS numberOfPostCreated\n" +
+                        "FROM piazza4db.user ORDER BY numberOfPostsRead DESC;";
+                PreparedStatement pst = conn.prepareStatement(query);
+                ResultSet rs = pst.executeQuery();
 
-            return rs;
-        } catch (Exception e) {
-            System.out.println("Noe gikk galt ved henting av statestikk. " + e);
+                return rs;
+            } catch (Exception e) {
+                System.out.println("Noe gikk galt ved henting av statestikk. " + e);
+            }
         }
         return null;
     }
