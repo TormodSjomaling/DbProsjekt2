@@ -1,5 +1,6 @@
 import Entities.Post;
 import Entities.User;
+import com.mysql.cj.protocol.Resultset;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -209,7 +210,17 @@ public class Engine extends DbConn{
         return matchingPosts;
     }
 
-    public boolean getStatisticsOfUsers(){
-        return false;
+    public ResultSet getStatisticsOfUsers(){
+        try {
+            String query = "SELECT name, (SELECT COUNT(*) FROM piazza4db.userpostview WHERE userID=user.userID) AS numberOfPostsRead, (SELECT COUNT(*) FROM piazza4db.post WHERE userID=user.userID) AS numberOfPostCreated\n" +
+                    "FROM piazza4db.user";
+            PreparedStatement pst = conn.prepareStatement(query);
+            ResultSet rs = pst.executeQuery();
+
+            return rs;
+        } catch (Exception e) {
+            System.out.println("Noe gikk galt ved henting av statestikk. " + e);
+        }
+        return null;
     }
 }
