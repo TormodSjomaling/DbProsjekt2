@@ -201,13 +201,19 @@ public class Application {
      */
     public void getStatisticsAboutUsers(){
         ResultSet rs = engine.getStatisticsOfUsers();
-        try {
-            System.out.println("Format: Navn...numberOfPostsRead...numberOfPostCreated");
-            while(rs.next()){
-                System.out.println(rs.getString("name") + " " + rs.getInt("numberOfPostsRead") + " " + rs.getInt("numberOfPostCreated"));
+
+        if (rs != null) {
+            try {
+                System.out.println("Format: Navn...numberOfPostsRead...numberOfPostCreated");
+                while(rs.next()){
+                    System.out.println(rs.getString("name") + " " + rs.getInt("numberOfPostsRead") + " " + rs.getInt("numberOfPostCreated"));
+                }
+            } catch (Exception e) {
+                System.out.println("Noe gikk galt ved printing av statistikk." + e);
             }
-        } catch (Exception e) {
-            System.out.println("Noe gikk galt ved printing av statistikk." + e);
+        }
+        else {
+            System.out.println("Du har ikke tilgang til å se statistikk.");
         }
     }
 }
