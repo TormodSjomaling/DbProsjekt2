@@ -1,6 +1,7 @@
 import Entities.Post;
 import Entities.User;
 
+import java.sql.ResultSet;
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -199,5 +200,14 @@ public class Application {
      * Handles interaction with the user to search for posts matching keyword.
      */
     public void getStatisticsAboutUsers(){
+        ResultSet rs = engine.getStatisticsOfUsers();
+        try {
+            System.out.println("Format: Navn...numberOfPostsRead...numberOfPostCreated");
+            while(rs.next()){
+                System.out.println(rs.getString("name") + " " + rs.getInt("numberOfPostsRead") + " " + rs.getInt("numberOfPostCreated"));
+            }
+        } catch (Exception e) {
+            System.out.println("Noe gikk galt ved printing av statistikk." + e);
+        }
     }
 }
