@@ -10,6 +10,9 @@ public class Post {
     private Integer isCommentOnPostID;
     private String folderName;
 
+    /**
+     * Constructor of Post object
+     * */
     public Post(Date date, String content, String threadTitle, Integer isCommentOnPostID) {
         this.date = date;
         this.content = content;
@@ -17,6 +20,9 @@ public class Post {
         this.isCommentOnPostID = isCommentOnPostID;
     }
 
+    /**
+     * Constructor of Post object
+     * */
     public Post(int postID, Date date, String content, String threadTitle, Integer isCommentOnPostID, String folderName) {
         this.postID = postID;
         this.content = content;
@@ -25,6 +31,9 @@ public class Post {
         this.folderName = folderName;
     }
 
+    /**
+     * Getters and Setters for Post object
+     */
     public String getFolderName() {
         return folderName;
     }

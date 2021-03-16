@@ -1,6 +1,5 @@
 import Entities.Post;
 import Entities.User;
-import com.mysql.cj.protocol.Resultset;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -36,7 +35,7 @@ public class Engine extends DbConn{
      */
     public boolean tryLogin(User user){
         Boolean successfulLogin = false;
-        try{
+        try {
             String query = "SELECT userID, email, password, role FROM piazza4db.user WHERE email = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, user.getEmail());
@@ -74,7 +73,7 @@ public class Engine extends DbConn{
             pst.setInt(1, userCurrentlyLoggedIn);
             ResultSet rs = pst.executeQuery();
 
-            if(rs.next()) {
+            if(rs.next()){
                 int courseID = rs.getInt("courseID");
 
                 String query2 = "SELECT folderID FROM piazza4db.folder WHERE name = ?";
@@ -94,7 +93,7 @@ public class Engine extends DbConn{
                     pst3.setInt(5, courseID);
                     pst3.setInt(6, userCurrentlyLoggedIn);
 
-                    if (pst3.executeUpdate() == 1) {
+                    if (pst3.executeUpdate() == 1){
                         conn.commit();
                         System.out.println("Post ble laget.\n");
 
@@ -127,11 +126,11 @@ public class Engine extends DbConn{
             pst.setInt(3, postID);
             pst.setInt(4, userCurrentlyLoggedIn);
 
-            if (pst.executeUpdate() == 1) {
+            if (pst.executeUpdate() == 1){
                 conn.commit();
                 System.out.println("Post ble laget.\n");
             }
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println("Noe gikk galt ved lagring av kommentar. " + e);
         }
     }
@@ -142,7 +141,7 @@ public class Engine extends DbConn{
      * @param postID int, ID of the post that user created, used in connection table between tag and post.
      */
     private void registerTagOnPost(String tagInput, int postID) {
-        try{
+        try {
             String query = "SELECT tagID FROM piazza4db.tag WHERE name = ?";
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, tagInput);
@@ -181,7 +180,7 @@ public class Engine extends DbConn{
                 Post post = new Post(rs.getInt("postID"), rs.getDate("createdAt"), rs.getString("content"), rs.getString("threadTitle"), null, rs.getString("name"));
                 posts.add(post);
             }
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println("Noe gikk galt ved henting a posts." + e);
         }
         return posts;
@@ -191,11 +190,11 @@ public class Engine extends DbConn{
      * Responsible for handling the backend part of fetching all posts matching user input and returning
      * all matching posts
      * @param userInput String, keyword that user searched for.
-     * @return List of postIDs matching the user input
+     * @return List of postIDs matching the user input.
      */
     public List<Integer> getPostsMatching(String userInput){
         List<Integer> matchingPosts = new ArrayList<>();
-        try{
+        try {
             String query = "SELECT postID FROM piazza4db.post WHERE threadTitle LIKE ? OR content LIKE ?";
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, '%' + userInput + '%');
@@ -207,14 +206,20 @@ public class Engine extends DbConn{
             }
 
             return matchingPosts;
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println("Noe gikk galt ved søket. " + e);
         }
         return matchingPosts;
     }
 
+    /**
+     * Responsible for fetching statistics about each user in the database.
+     * Fetches the name, the number of posts viewed/read and number of posts created by each user
+     * Also responsible for checking the permission of the user.
+     * @return Returns the ResultSet from the query.
+     */
     public ResultSet getStatisticsOfUsers(){
-        if (rolePermissions == 1) {
+        if (rolePermissions == 1){
             try {
                 String query = "SELECT name, (SELECT COUNT(*) FROM piazza4db.userpostview WHERE userID=user.userID) AS numberOfPostsRead, (SELECT COUNT(*) FROM piazza4db.post WHERE userID=user.userID) AS numberOfPostCreated\n" +
                         "FROM piazza4db.user ORDER BY numberOfPostsRead DESC;";
