@@ -204,12 +204,14 @@ public class Application {
 
         if (rs != null) {
             try {
-                System.out.println("Format: Navn...numberOfPostsRead...numberOfPostCreated");
+                System.out.println("\nFormat: Navn...numberOfPostsRead...numberOfPostCreated");
                 while(rs.next()){
                     System.out.println(rs.getString("name") + " " + rs.getInt("numberOfPostsRead") + " " + rs.getInt("numberOfPostCreated"));
                 }
             } catch (Exception e) {
                 System.out.println("Noe gikk galt ved printing av statistikk." + e);
+            } finally {
+                try { if (rs != null) rs.close(); } catch (Exception e) {};
             }
         }
         else {
